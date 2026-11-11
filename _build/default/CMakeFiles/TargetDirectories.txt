@@ -1,0 +1,4 @@
+/home/jon/Projects/Programming/Embedded/opgave3/_build/default/CMakeFiles/A___default_default_XC8_compile.dir
+/home/jon/Projects/Programming/Embedded/opgave3/_build/default/CMakeFiles/__default_image_tiddnQyv.dir
+/home/jon/Projects/Programming/Embedded/opgave3/_build/default/CMakeFiles/edit_cache.dir
+/home/jon/Projects/Programming/Embedded/opgave3/_build/default/CMakeFiles/rebuild_cache.dir
