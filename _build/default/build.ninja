@@ -54,12 +54,32 @@ build CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programmi
   TARGET_PDB = ""
   TARGET_SUPPORT_DIR = CMakeFiles/A___default_default_XC8_compile.dir
 
+build CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src/state_machine.c.o: C_COMPILER__A___default_default_XC8_compile_unscanned_ /home/jon/Projects/Programming/Embedded/opgave3/src/state_machine.c || cmake_object_order_depends_target_A___default_default_XC8_compile
+  DEFINES = -DXPRJ_default=default -D__ATmega328PB__
+  DEP_FILE = CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src/state_machine.c.o.d
+  FLAGS = -c -mcpu=ATmega328PB -x c -mdfp=/home/jon/.mchp_packs/Microchip/ATmega_DFP/3.6.299/xc8 -Wl,--gc-sections -O0 -ffunction-sections -fdata-sections -fshort-enums -funsigned-char -funsigned-bitfields -Wall -gdwarf-3 -mno-const-data-in-progmem
+  OBJECT_DIR = CMakeFiles/A___default_default_XC8_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src
+  TARGET_COMPILE_PDB = CMakeFiles/A___default_default_XC8_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/A___default_default_XC8_compile.dir
+
+build CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src/uart.c.o: C_COMPILER__A___default_default_XC8_compile_unscanned_ /home/jon/Projects/Programming/Embedded/opgave3/src/uart.c || cmake_object_order_depends_target_A___default_default_XC8_compile
+  DEFINES = -DXPRJ_default=default -D__ATmega328PB__
+  DEP_FILE = CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src/uart.c.o.d
+  FLAGS = -c -mcpu=ATmega328PB -x c -mdfp=/home/jon/.mchp_packs/Microchip/ATmega_DFP/3.6.299/xc8 -Wl,--gc-sections -O0 -ffunction-sections -fdata-sections -fshort-enums -funsigned-char -funsigned-bitfields -Wall -gdwarf-3 -mno-const-data-in-progmem
+  OBJECT_DIR = CMakeFiles/A___default_default_XC8_compile.dir
+  OBJECT_FILE_DIR = CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src
+  TARGET_COMPILE_PDB = CMakeFiles/A___default_default_XC8_compile.dir/
+  TARGET_PDB = ""
+  TARGET_SUPPORT_DIR = CMakeFiles/A___default_default_XC8_compile.dir
+
 
 
 #############################################
 # Object library A___default_default_XC8_compile
 
-build A___default_default_XC8_compile: phony CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/main.c.o
+build A___default_default_XC8_compile: phony CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/main.c.o CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src/state_machine.c.o CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src/uart.c.o
 
 # =============================================================================
 # Object build statements for EXECUTABLE target __default_image_tiddnQyv
@@ -78,7 +98,7 @@ build cmake_object_order_depends_target___default_image_tiddnQyv: phony || cmake
 #############################################
 # Link the executable /home/jon/Projects/Programming/Embedded/opgave3/out/default.elf
 
-build /home/jon/Projects/Programming/Embedded/opgave3/out/default.elf: C_EXECUTABLE_LINKER____default_image_tiddnQyv_ CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/main.c.o || A___default_default_XC8_compile
+build /home/jon/Projects/Programming/Embedded/opgave3/out/default.elf: C_EXECUTABLE_LINKER____default_image_tiddnQyv_ CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/main.c.o CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src/state_machine.c.o CMakeFiles/A___default_default_XC8_compile.dir/home/jon/Projects/Programming/Embedded/opgave3/src/uart.c.o || A___default_default_XC8_compile
   LINK_FLAGS = -Wl,-Map=mem.map -mcpu=ATmega328PB -Wl,--defsym=__MPLAB_BUILD=1 -mdfp=/home/jon/.mchp_packs/Microchip/ATmega_DFP/3.6.299/xc8 -Wl,--gc-sections -O0 -ffunction-sections -fdata-sections -fshort-enums -funsigned-char -funsigned-bitfields -Wall -gdwarf-3 -mno-const-data-in-progmem -Wl,--memorysummary,memoryfile.xml
   OBJECT_DIR = CMakeFiles/__default_image_tiddnQyv.dir
   POST_BUILD = cd /home/jon/Projects/Programming/Embedded/opgave3/out && /opt/microchip/xc8/v4.00/bin/avr-objcopy -O ihex default.elf default.hex
