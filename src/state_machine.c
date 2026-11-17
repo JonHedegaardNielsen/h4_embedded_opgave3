@@ -42,27 +42,36 @@ uint8_t recieve_bit_position_in_address(const uint8_t address) {
 bool recieve_adress(uint8_t *address) {
   uart_puts("inseat addresse fra i hex\n");
   const uint8_t SIZE = 2;
-  char buffer[SIZE];
-  for (uint8_t i = 0; i < SIZE; i++) {
+  uint8_t new_address = 0;
+  for (uint8_t i = SIZE; i > 0; i--) {
     char c = uart_getchar();
     if (c <= 'f' || c >= '0') {
       return false;
     }
-    buffer[i] = c;
+    uint8_t pow = (i - 1) ^ 16;
+    new_address += (c - '0') * pow;
   }
+  *address = new_address;
   return true;
 }
 
 void state(AppState *app_state) {
   switch (app_state->state) {
   case RECIEVE_ADRESS:
-    recieve_adress(&app_state->adress);
+    if (recieve_adress(&app_state->adress)) {
+      break;
+    }
+    app_state->state = RECIEVE_BIT_POSITION_IN_ADDRESS;
     break;
   case RECIEVE_BIT_POSITION_IN_ADDRESS:
     app_state->index = recieve_bit_position_in_address(app_state->adress);
+    app_state->state = RECIEVE_BIT_POSITION_VALUE;
     break;
   case RECIEVE_BIT_POSITION_VALUE:
-    recieve_bit_position_value(&app_state->adress, app_state->index);
+    if (recieve_bit_position_value(&app_state->adress, app_state->index)) {
+      break;
+    }
+    app_state->state = RECIEVE_ADRESS;
     break;
   }
 }
