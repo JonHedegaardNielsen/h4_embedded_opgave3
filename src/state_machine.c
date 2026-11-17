@@ -55,13 +55,13 @@ bool recieve_adress(uint8_t *address) {
 
 void state(AppState *app_state) {
   switch (app_state->state) {
-  RECIEVE_ADRESS:
+  case RECIEVE_ADRESS:
     recieve_adress(&app_state->adress);
     break;
-  RECIEVE_BIT_POSITION_IN_ADDRESS:
+  case RECIEVE_BIT_POSITION_IN_ADDRESS:
     app_state->index = recieve_bit_position_in_address(app_state->adress);
     break;
-  RECIEVE_BIT_POSITION_VALUE:
+  case RECIEVE_BIT_POSITION_VALUE:
     recieve_bit_position_value(&app_state->adress, app_state->index);
     break;
   }
