@@ -30,8 +30,6 @@ Programmet læser tegn fra UART indtil, at adressen afsluttes med **Enter eller 
 
 ## Eksempel på brug
 
-Sæt bit 2 i PortB (adresse 0x0025) som output og høj. Først sættes bit 2 i PortB's direction-register (adresse 0x0024), derefter i selve adressen:
-
 ```text
 Tilstand: Modtag_Adresse - indtast adresse i hex, afslut med Enter eller ':'
 20:
@@ -45,7 +43,7 @@ Bit vaerdi: 1
 Bit moenster: 0010 0001
 ```
 
-Adressen, bitpositionen og bitværdien indtastes én ad gangen, når programmet beder om dem. Adressen kan også afsluttes med `:` i stedet for Enter.
+Adressen, bitpositionen og bitværdien indtastes én ad gangen, når programmet beder om dem. Adressen kan både afsluttes med `:` og `Enter`.
 
 ## Programstruktur
 
