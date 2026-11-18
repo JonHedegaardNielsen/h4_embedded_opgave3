@@ -25,37 +25,27 @@ Programmet læser tegn fra UART indtil, at adressen afsluttes med **Enter eller 
 
 ### Tilstand 3: Modtag_Bit_Position_Vaerdi
 
-- Modtages et gyldigt ciffer (0 eller 1) → sætter programmet via en pointer, der peger på den modtagede adresse, enten bitpositionen høj (ved 1) eller lav (ved 0). Det sker med read-modify-write (`*p |= (1 << position)` / `*p &= ~(1 << position)`), så kun den ene udpegede bit ændres – resten af porten er uberørt. Herefter udskrives info på UART og programmet skifter tilbage til `Modtag_Adresse`.
+- Modtages et gyldigt ciffer (0 eller 1) → sætter programmet via en pointer, der peger på den modtagede adresse, enten bitpositionen høj (ved 1) eller lav (ved 0). Det sker med read-modify-write (`*p |= (1 << position)` / `*p &= ~(1 << position)`), så kun den ene udpegede bit ændres – resten af adressen er uberørt. Herefter udskrives info på UART og programmet skifter tilbage til `Modtag_Adresse`.
 - Modtages et ugyldigt tegn → programmet skifter tilbage til `Modtag_Adresse` uden at foretage sig andet.
-
-## UART-output
-
-Ved hver tilstandsskift udskrives en besked med den nye tilstand og hvad der skal indtastes. Efter en vellykket bit-operation udskrives 4 linjer:
-
-```text
-Adresse: 0x0025
-Bit position: 2
-Bit vaerdi: 1
-Bit moenster: 0000 0100
-```
-
-`Bit moenster` er det aktuelle bitmønster (bit 7 til bit 0) i registeret på adressen.
 
 ## Eksempel på brug
 
-Sæt bit 2 i PortB (adresse 0x0025) som output og høj. Først sættes bit 2 i PortB's direction-register (adresse 0x0024), derefter i selve porten:
+Sæt bit 2 i PortB (adresse 0x0025) som output og høj. Først sættes bit 2 i PortB's direction-register (adresse 0x0024), derefter i selve adressen:
 
 ```text
-0x0024 <Enter>  2 <Enter>  1 <Enter>   → DDRB bit 2 = output
-0x0025 <Enter>  2 <Enter>  1 <Enter>   → PORTB bit 2 = høj
+Tilstand: Modtag_Adresse - indtast adresse i hex, afslut med Enter eller ':'
+20:
+Tilstand: Modtag_Bit_Position_I_Adresse - indtast ciffer 0-7
+0
+Tilstand: Modtag_Bit_Position_Vaerdi - indtast 0 eller 1
+1
+Adresse: 0x0021
+Bit position: 0
+Bit vaerdi: 1
+Bit moenster: 0010 0001
 ```
 
 Adressen, bitpositionen og bitværdien indtastes én ad gangen, når programmet beder om dem. Adressen kan også afsluttes med `:` i stedet for Enter.
-
-## UART-indstillinger
-
-- UART0, 9600 baud, 8 data bits, ingen parity, 1 stop bit (8N1)
-- Baud-rate beregnes i `include/ProjectDefines.h` ud fra `F_CPU = 16 MHz`
 
 ## Programstruktur
 
