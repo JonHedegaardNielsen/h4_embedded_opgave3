@@ -33,7 +33,7 @@ uint8_t hex_character_to_digit(char character) {
 }
 
 void receive_address(uint16_t *address) {
-  uart_puts("Tilstand: Modtag_Adresse - indtast adresse i hex, afslut med ':'\n");
+  uart_puts("Tilstand: Modtag_Adresse - indtast adresse i hex, afslut med ':'\r\n");
   uint16_t new_address = 0;
   char c;
   while ((c = read_input_character()) != ':') {
@@ -45,34 +45,34 @@ void receive_address(uint16_t *address) {
     }
     new_address = (uint16_t)(new_address * 16 + hex_character_to_digit(c));
   }
-  uart_puts("\n");
+  uart_puts("\r\n");
   *address = new_address;
 }
 
 bool receive_bit_position_in_address(uint8_t *index) {
-  uart_puts("Tilstand: Modtag_Bit_Position_I_Adresse - indtast ciffer 0-7\n");
+  uart_puts("Tilstand: Modtag_Bit_Position_I_Adresse - indtast ciffer 0-7\r\n");
   char c = read_input_character();
   if (c < '0' || c > '7') {
-    uart_puts("\nUgyldig position - indtast ny adresse\n");
+    uart_puts("\r\nUgyldig position - indtast ny adresse\r\n");
     return false;
   }
   *index = c - '0';
-  uart_puts("\n");
+  uart_puts("\r\n");
   return true;
 }
 
 bool receive_bit_position_value(uint16_t address, uint8_t position,
                                 uint8_t *bitvalue) {
-  uart_puts("Tilstand: Modtag_Bit_Position_Vaerdi - indtast 0 eller 1\n");
+  uart_puts("Tilstand: Modtag_Bit_Position_Vaerdi - indtast 0 eller 1\r\n");
   char c = read_input_character();
   if (!validate_bit(c)) {
-    uart_puts("\nUgyldig vaerdi - indtast ny adresse\n");
+    uart_puts("\r\nUgyldig vaerdi - indtast ny adresse\r\n");
     return false;
   }
-  uart_puts("\n");
+  uart_puts("\r\n");
   *bitvalue = c - '0';
 
-  uint8_t *p = (uint8_t *)address;
+  volatile uint8_t *p = (volatile uint8_t *)address;
   if (*bitvalue == 1) {
     *p |= (uint8_t)(1 << position);
   } else {
@@ -97,7 +97,15 @@ void state(AppState *app_state) {
   case RECEIVE_BIT_POSITION_VALUE:
     if (receive_bit_position_value(app_state->address, app_state->index,
                                    &app_state->bitvalue)) {
-        break;
+      uart_puts("Adresse: ");
+      uart_puthex16(app_state->address);
+      uart_puts("\r\nBit position: ");
+      uart_putuint8(app_state->index);
+      uart_puts("\r\nBit vaerdi: ");
+      uart_putuint8(app_state->bitvalue);
+      uart_puts("\r\nBit moenster: ");
+      uart_putbits8(*(uint8_t *)app_state->address);
+      uart_puts("\r\n");
     }
     app_state->state = RECEIVE_ADDRESS;
     break;
