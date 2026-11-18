@@ -67,7 +67,7 @@ bool receive_bit_position_in_address(uint8_t *index) {
   return true;
 }
 
-bool receive_bit_position_value(uint8_t address, uint8_t position,
+bool receive_bit_position_value(uint8_t *address, uint8_t position,
                                 uint8_t *bitvalue) {
   uart_puts("Tilstand: Modtag_Bit_Position_Vaerdi - indtast 0 eller 1\r\n");
   char c;
@@ -81,11 +81,11 @@ bool receive_bit_position_value(uint8_t address, uint8_t position,
   uart_puts("\r\n");
   *bitvalue = c - '0';
 
-  volatile uint8_t *p = (volatile uint8_t *)(uintptr_t)address;
+  
   if (*bitvalue == 1) {
-    *p |= (uint8_t)(1 << position);
+    *address |= (1 << position);
   } else {
-    *p &= (uint8_t)~(1 << position);
+    *address &= ~(1 << position);
   }
   return true;
 }
@@ -104,7 +104,7 @@ void state(AppState *app_state) {
     }
     break;
   case RECEIVE_BIT_POSITION_VALUE:
-    if (receive_bit_position_value(app_state->address, app_state->index,
+    if (receive_bit_position_value(&app_state->address, app_state->index,
                                    &app_state->bitvalue)) {
       uart_puts("Adresse: ");
       uart_puthex16(app_state->address);
@@ -113,7 +113,7 @@ void state(AppState *app_state) {
       uart_puts("\r\nBit vaerdi: ");
       uart_putuint8(app_state->bitvalue);
       uart_puts("\r\nBit moenster: ");
-      uart_putbits8(*(uint8_t *)(uintptr_t)app_state->address);
+      uart_putbits8(app_state->address);
       uart_puts("\r\n");
     }
     app_state->state = RECEIVE_ADDRESS;

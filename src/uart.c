@@ -53,7 +53,7 @@ void uart_puthex16(uint16_t value) {
 
 void uart_putbits8(uint8_t value) {
   for (uint8_t i = 0; i < 8; i++) {
-    uart_putchar((value & (uint8_t)(0x80 >> i)) ? '1' : '0');
+    uart_putchar((value & (0x80 >> i)) ? '1' : '0');
     if (i == 3) {
       uart_putchar(' ');
     }
