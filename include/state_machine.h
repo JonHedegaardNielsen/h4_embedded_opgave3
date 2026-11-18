@@ -11,7 +11,7 @@ typedef enum {
 
 typedef struct {
   State state;
-  uint16_t address;
+  uint8_t address;
   uint8_t index;
   uint8_t bitvalue;
 } AppState;

@@ -16,7 +16,7 @@ Ved start står programmet i `RECEIVE_ADDRESS`. Programmet udskriver en besked p
 
 ### Tilstand 1: Modtag_Adresse
 
-Programmet læser tegn fra UART indtil, at adressen afsluttes med **Enter eller `:`**. Tegnene opfattes som et hexadecimalt tal (f.eks. `0x0025`, `0x25` eller blot `25`). Et `0x`/`0X`-præfiks springes over, så det førende `0` tæller ikke som en hex-digit, og der accepteres højst 4 hex-digits (16-bit) – yderligere digits ignoreres. Når adressen afsluttes, skifter programmet til `Modtag_Bit_Position_I_Adresse`.
+Programmet læser tegn fra UART indtil, at adressen afsluttes med **Enter eller `:`**. Tegnene opfattes som et hexadecimalt tal, og adressen er 8-bit (port-registrene ligger i datalområdet 0x20–0x5F), så kun de to sidste hex-digits tæller: `0x0025`, `0x25` og `25` giver alle adressen `0x25`, og adressen kan aldrig blive større end `0xFF`. Ved udskrivning vises adressen altid med 4 hex-digits (f.eks. `0x0025`), som opgaven foreskriver. Når adressen afsluttes, skifter programmet til `Modtag_Bit_Position_I_Adresse`.
 
 ### Tilstand 2: Modtag_Bit_Position_I_Adresse
 

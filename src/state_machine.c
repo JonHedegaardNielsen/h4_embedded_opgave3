@@ -31,33 +31,22 @@ uint8_t hex_character_to_digit(char character) {
   return character - '0';
 }
 
-void receive_address(uint16_t *address) {
+void receive_address(uint8_t *address) {
   uart_puts("Tilstand: Modtag_Adresse - indtast adresse i hex, afslut med Enter eller ':'\r\n");
-  uint16_t new_address = 0;
-  uint8_t digits = 0;
-  uint8_t pending_zero = 0;
+  uint8_t new_address = 0;
   char c;
   while (1) {
     c = read_input_character();
     if (c == '\r' || c == '\n' || c == ':') {
       break;
     }
-    if (pending_zero) {
-      if (c == 'x' || c == 'X') {
-        pending_zero = 0;
-        continue;
-      }
-      pending_zero = 0;
-      digits++;
-    } else if (c == '0' && digits == 0) {
-      pending_zero = 1;
+    if (c == 'x' || c == 'X') {
       continue;
     }
-    if (!validate_hex_character(c) || digits == 4) {
+    if (!validate_hex_character(c)) {
       continue;
     }
-    new_address = (uint16_t)(new_address * 16 + hex_character_to_digit(c));
-    digits++;
+    new_address = (uint8_t)(new_address * 16 + hex_character_to_digit(c));
   }
   uart_puts("\r\n");
   *address = new_address;
@@ -78,7 +67,7 @@ bool receive_bit_position_in_address(uint8_t *index) {
   return true;
 }
 
-bool receive_bit_position_value(uint16_t address, uint8_t position,
+bool receive_bit_position_value(uint8_t address, uint8_t position,
                                 uint8_t *bitvalue) {
   uart_puts("Tilstand: Modtag_Bit_Position_Vaerdi - indtast 0 eller 1\r\n");
   char c;
@@ -92,7 +81,7 @@ bool receive_bit_position_value(uint16_t address, uint8_t position,
   uart_puts("\r\n");
   *bitvalue = c - '0';
 
-  volatile uint8_t *p = (volatile uint8_t *)address;
+  volatile uint8_t *p = (volatile uint8_t *)(uintptr_t)address;
   if (*bitvalue == 1) {
     *p |= (uint8_t)(1 << position);
   } else {
@@ -124,7 +113,7 @@ void state(AppState *app_state) {
       uart_puts("\r\nBit vaerdi: ");
       uart_putuint8(app_state->bitvalue);
       uart_puts("\r\nBit moenster: ");
-      uart_putbits8(*(uint8_t *)app_state->address);
+      uart_putbits8(*(uint8_t *)(uintptr_t)app_state->address);
       uart_puts("\r\n");
     }
     app_state->state = RECEIVE_ADDRESS;
