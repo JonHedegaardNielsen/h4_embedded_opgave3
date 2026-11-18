@@ -1,7 +1,11 @@
 #include "include/state_machine.h"
+#include "include/uart.h"
 
 int main() {
-  AppState appState = {.state = RECIEVE_ADRESS, .adress = 0, .index = -1};
+  uart_init();
+
+  AppState appState = {
+      .state = RECEIVE_ADDRESS, .address = 0, .index = 0, .bitvalue = 0};
   while (1) {
     state(&appState);
   }

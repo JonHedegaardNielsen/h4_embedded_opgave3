@@ -1,77 +1,105 @@
+#include "../include/state_machine.h"
 #include "../include/uart.h"
 #include <stdbool.h>
 #include <stdint.h>
-typedef enum {
-  RECIEVE_ADRESS,
-  RECIEVE_BIT_POSITION_IN_ADDRESS,
-  RECIEVE_BIT_POSITION_VALUE,
-} State;
 
-typedef struct {
-  State state;
-  uint8_t adress;
-  uint8_t index;
-} AppState;
-
-bool validate_bit(char charecter) {
-  return charecter == '0' || charecter == '1';
+bool validate_hex_character(char character) {
+  return (character >= '0' && character <= '9') ||
+         (character >= 'a' && character <= 'f') ||
+         (character >= 'A' && character <= 'F');
 }
 
-bool recieve_bit_position_value(uint8_t *address, const uint8_t position) {
-  uart_puts("inseat bit veardi fra 0-1\n");
-  char c = uart_getchar();
-  if (!validate_bit(c)) {
+bool validate_bit(char character) {
+  return character == '0' || character == '1';
+}
+
+char read_input_character(void) {
+  char c;
+  do {
+    c = uart_getchar();
+  } while (c == '\r' || c == '\n');
+  uart_putchar(c);
+  return c;
+}
+
+uint8_t hex_character_to_digit(char character) {
+  if (character >= 'a') {
+    return character - 'a' + 10;
+  }
+  if (character >= 'A') {
+    return character - 'A' + 10;
+  }
+  return character - '0';
+}
+
+void receive_address(uint16_t *address) {
+  uart_puts("Tilstand: Modtag_Adresse - indtast adresse i hex, afslut med ':'\n");
+  uint16_t new_address = 0;
+  char c;
+  while ((c = read_input_character()) != ':') {
+    if (c == 'x' || c == 'X') {
+      continue;
+    }
+    if (!validate_hex_character(c)) {
+      continue;
+    }
+    new_address = (uint16_t)(new_address * 16 + hex_character_to_digit(c));
+  }
+  uart_puts("\n");
+  *address = new_address;
+}
+
+bool receive_bit_position_in_address(uint8_t *index) {
+  uart_puts("Tilstand: Modtag_Bit_Position_I_Adresse - indtast ciffer 0-7\n");
+  char c = read_input_character();
+  if (c < '0' || c > '7') {
+    uart_puts("\nUgyldig position - indtast ny adresse\n");
     return false;
   }
-  uint8_t bitvalue = c - '0';
-  if (0 == bitvalue) {
-    *address |= (1 << position);
-  } else {
-    *address &= ~(1 << position);
-  }
+  *index = c - '0';
+  uart_puts("\n");
   return true;
 }
 
-uint8_t recieve_bit_position_in_address(const uint8_t address) {
-  uart_puts("inseat position fra 0-7\n");
-  char c = uart_getchar();
-  uint8_t index = c - '0';
-  return index;
-}
-
-bool recieve_adress(uint8_t *address) {
-  uart_puts("inseat addresse fra i hex\n");
-  const uint8_t SIZE = 2;
-  uint8_t new_address = 0;
-  for (uint8_t i = SIZE; i > 0; i--) {
-    char c = uart_getchar();
-    if (c <= 'f' || c >= '0') {
-      return false;
-    }
-    uint8_t pow = (i - 1) ^ 16;
-    new_address += (c - '0') * pow;
+bool receive_bit_position_value(uint16_t address, uint8_t position,
+                                uint8_t *bitvalue) {
+  uart_puts("Tilstand: Modtag_Bit_Position_Vaerdi - indtast 0 eller 1\n");
+  char c = read_input_character();
+  if (!validate_bit(c)) {
+    uart_puts("\nUgyldig vaerdi - indtast ny adresse\n");
+    return false;
   }
-  *address = new_address;
+  uart_puts("\n");
+  *bitvalue = c - '0';
+
+  uint8_t *p = (uint8_t *)address;
+  if (*bitvalue == 1) {
+    *p |= (uint8_t)(1 << position);
+  } else {
+    *p &= (uint8_t)~(1 << position);
+  }
   return true;
 }
 
 void state(AppState *app_state) {
   switch (app_state->state) {
-  case RECIEVE_ADRESS:
-    if (recieve_adress(&app_state->adress)) {
-      break;
-    }
-    app_state->state = RECIEVE_BIT_POSITION_IN_ADDRESS;
+  case RECEIVE_ADDRESS:
+    receive_address(&app_state->address);
+    app_state->state = RECEIVE_BIT_POSITION_IN_ADDRESS;
     break;
-  case RECIEVE_BIT_POSITION_IN_ADDRESS:
-    app_state->index = recieve_bit_position_in_address(app_state->adress);
-    app_state->state = RECIEVE_BIT_POSITION_VALUE;
-    break;
-  case RECIEVE_BIT_POSITION_VALUE:
-    if (recieve_bit_position_value(&app_state->adress, app_state->index)) {
-      break;
+  case RECEIVE_BIT_POSITION_IN_ADDRESS:
+    if (receive_bit_position_in_address(&app_state->index)) {
+      app_state->state = RECEIVE_BIT_POSITION_VALUE;
+    } else {
+      app_state->state = RECEIVE_ADDRESS;
     }
-    app_state->state = RECIEVE_ADRESS;
+    break;
+  case RECEIVE_BIT_POSITION_VALUE:
+    if (receive_bit_position_value(app_state->address, app_state->index,
+                                   &app_state->bitvalue)) {
+        break;
+    }
+    app_state->state = RECEIVE_ADDRESS;
     break;
   }
 }
