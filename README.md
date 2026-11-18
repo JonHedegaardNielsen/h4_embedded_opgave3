@@ -12,11 +12,11 @@ Programmet er bygget op omkring en tilstandsmaskine med 3 tilstande, der styres 
 | `RECEIVE_BIT_POSITION_IN_ADDRESS` (`Modtag_Bit_Position_I_Adresse`) | Ciffer 0–7 |
 | `RECEIVE_BIT_POSITION_VALUE` (`Modtag_Bit_Position_Vaerdi`) | Ciffer 0 eller 1 |
 
-Ved start står programmet i `RECEIVE_ADDRESS`. Programmet udskriver en besked på UART, hver gang det skifter tilstand, så man i terminalprogrammet altid kan se, hvilken tilstand programmet er i, og hvad der skal indtastes. Alle modtagede tegn ekko's tilbage til terminalen (minicom ekko som standard ikke lokalt), og linjeskift (`\r`/`\n` fra Enter) ignoreres i alle tilstande, så man kan trykke Enter efter et tegn uden at det tæller som ugyldigt input.
+Ved start står programmet i `RECEIVE_ADDRESS`. Programmet udskriver en besked på UART, hver gang det skifter tilstand, så man i terminalprogrammet altid kan se, hvilken tilstand programmet er i, og hvad der skal indtastes. Alle modtagede tegn ekko's tilbage til terminalen (minicom ekko som standard ikke lokalt). I `Modtag_Bit_Position_I_Adresse` og `Modtag_Bit_Position_Vaerdi` ignoreres linjeskift (`\r`/`\n` fra Enter), så man kan trykke Enter efter et tegn uden at det tæller som ugyldigt input.
 
 ### Tilstand 1: Modtag_Adresse
 
-Programmet læser tegn fra UART indtil, at der modtages et `:`. Tegnene opfattes som et hexadecimalt tal (f.eks. `0x0025` eller blot `25`). `x`/`X` i et `0x`-præfiks ignoreres, og ugyldige tegn springes over. Bemærk at adressen **skal** afsluttes med `:` – Enter sender kun et linjeskift (`\r`), som ignoreres. Når `:` modtages, skifter programmet til `Modtag_Bit_Position_I_Adresse`.
+Programmet læser tegn fra UART indtil, at adressen afsluttes med **Enter eller `:`**. Tegnene opfattes som et hexadecimalt tal (f.eks. `0x0025`, `0x25` eller blot `25`). Et `0x`/`0X`-præfiks springes over, så det førende `0` tæller ikke som en hex-digit, og der accepteres højst 4 hex-digits (16-bit) – yderligere digits ignoreres. Når adressen afsluttes, skifter programmet til `Modtag_Bit_Position_I_Adresse`.
 
 ### Tilstand 2: Modtag_Bit_Position_I_Adresse
 
@@ -46,11 +46,11 @@ Bit moenster: 0000 0100
 Sæt bit 2 i PortB (adresse 0x0025) som output og høj. Først sættes bit 2 i PortB's direction-register (adresse 0x0024), derefter i selve porten:
 
 ```text
-Indtast: 0x0024 : 2 : 1   → DDRB bit 2 = output
-Indtast: 0x0025 : 2 : 1   → PORTB bit 2 = høj
+0x0024 <Enter>  2 <Enter>  1 <Enter>   → DDRB bit 2 = output
+0x0025 <Enter>  2 <Enter>  1 <Enter>   → PORTB bit 2 = høj
 ```
 
-(Adressen, bitpositionen og bitværdien indtastes én ad gangen, når programmet beder om dem.)
+Adressen, bitpositionen og bitværdien indtastes én ad gangen, når programmet beder om dem. Adressen kan også afsluttes med `:` i stedet for Enter.
 
 ## UART-indstillinger
 

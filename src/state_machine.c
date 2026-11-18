@@ -14,11 +14,10 @@ bool validate_bit(char character) {
 }
 
 char read_input_character(void) {
-  char c;
-  do {
-    c = uart_getchar();
-  } while (c == '\r' || c == '\n');
-  uart_putchar(c);
+  char c = uart_getchar();
+  if (c != '\r' && c != '\n') {
+    uart_putchar(c);
+  }
   return c;
 }
 
@@ -33,17 +32,32 @@ uint8_t hex_character_to_digit(char character) {
 }
 
 void receive_address(uint16_t *address) {
-  uart_puts("Tilstand: Modtag_Adresse - indtast adresse i hex, afslut med ':'\r\n");
+  uart_puts("Tilstand: Modtag_Adresse - indtast adresse i hex, afslut med Enter eller ':'\r\n");
   uint16_t new_address = 0;
+  uint8_t digits = 0;
+  uint8_t pending_zero = 0;
   char c;
-  while ((c = read_input_character()) != ':') {
-    if (c == 'x' || c == 'X') {
+  while (1) {
+    c = read_input_character();
+    if (c == '\r' || c == '\n' || c == ':') {
+      break;
+    }
+    if (pending_zero) {
+      if (c == 'x' || c == 'X') {
+        pending_zero = 0;
+        continue;
+      }
+      pending_zero = 0;
+      digits++;
+    } else if (c == '0' && digits == 0) {
+      pending_zero = 1;
       continue;
     }
-    if (!validate_hex_character(c)) {
+    if (!validate_hex_character(c) || digits == 4) {
       continue;
     }
     new_address = (uint16_t)(new_address * 16 + hex_character_to_digit(c));
+    digits++;
   }
   uart_puts("\r\n");
   *address = new_address;
@@ -51,7 +65,10 @@ void receive_address(uint16_t *address) {
 
 bool receive_bit_position_in_address(uint8_t *index) {
   uart_puts("Tilstand: Modtag_Bit_Position_I_Adresse - indtast ciffer 0-7\r\n");
-  char c = read_input_character();
+  char c;
+  do {
+    c = read_input_character();
+  } while (c == '\r' || c == '\n');
   if (c < '0' || c > '7') {
     uart_puts("\r\nUgyldig position - indtast ny adresse\r\n");
     return false;
@@ -64,7 +81,10 @@ bool receive_bit_position_in_address(uint8_t *index) {
 bool receive_bit_position_value(uint16_t address, uint8_t position,
                                 uint8_t *bitvalue) {
   uart_puts("Tilstand: Modtag_Bit_Position_Vaerdi - indtast 0 eller 1\r\n");
-  char c = read_input_character();
+  char c;
+  do {
+    c = read_input_character();
+  } while (c == '\r' || c == '\n');
   if (!validate_bit(c)) {
     uart_puts("\r\nUgyldig vaerdi - indtast ny adresse\r\n");
     return false;
